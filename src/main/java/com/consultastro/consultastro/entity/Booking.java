@@ -19,4 +19,7 @@ public class Booking {
     private String dob;
     private String service;
     private String message;
+
+    public String Phone;
+
 }

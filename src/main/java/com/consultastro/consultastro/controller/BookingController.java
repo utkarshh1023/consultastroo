@@ -1,13 +1,11 @@
 package com.consultastro.consultastro.controller;
 
 import com.consultastro.consultastro.entity.Booking;
-import com.consultastro.consultastro.repository.BookingRepository;
 import com.consultastro.consultastro.services.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.consultastro.consultastro.services.EmailService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/booking")
@@ -15,14 +13,26 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService service;
+    private final EmailService emailService;
 
-    public BookingController(BookingService service) {
+    public BookingController(BookingService service, EmailService emailService) {
         this.service = service;
+        this.emailService = emailService;
     }
 
     @PostMapping
     public Booking book(@RequestBody Booking booking){
-        return service.createBooking(booking);
+
+        Booking savedBooking = service.createBooking(booking);
+
+        // send confirmation email
+        emailService.sendBookingEmail(
+                booking.getEmail(),
+                booking.getName(),
+                booking.getService()
+        );
+
+        return savedBooking;
     }
 
     @GetMapping("/admin")
